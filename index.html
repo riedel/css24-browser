@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <script src="src/index.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <div
+      class="d-flex align-items-center flex-column justify-content-center h-100 bg-dark text-white"
+    >
+      <form>
+        <h1>
+          <div class="form-check form-switch form-switch-lg">
+            <input class="form-check-input" type="checkbox" id="record" />
+            <label class="form-check-label" for="flexSwitchCheckDefault"
+              >Record</label
+            >
+          </div>
+        </h1>
+        <div class="form-group">
+          <label class="control-label form-control-lg" for="label"
+            >Activity</label
+          >
+          <select class="form-control form-control-lg" id="label">
+            <option value="testing">Testing</option>
+            <option value="walking">Walking</option>
+            <option value="standing">Standing</option>
+            <option value="sitting">Sitting</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label form-control-lg" for="subject"
+            >Participant Id</label
+          >
+          <input
+            class="form-control form-control-lg"
+            type="text"
+            id="subject"
+          />
+        </div>
+      </form>
+
+      <div class="alert alert-primary" role="alert" id="debug">
+        Not recording yet...
+      </div>
+    </div>
+  </body>
+</html>
