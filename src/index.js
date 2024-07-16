@@ -56,8 +56,8 @@ const p = new Predictor(
     "rotationRate.beta",
     "rotationRate.gamma",
   ],
-  -1000,
-  ["Walking", "Standing", "Sitting"],
+  -500,
+  ['sitting', 'walking', 'standing'],
 );
 
 var sensors = {
