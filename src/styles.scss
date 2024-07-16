@@ -13,8 +13,6 @@
     $mainVal: 2.5rem;
   }
 
-  margin-bottom: $index / 2; /* JUST FOR STYLING PURPOSE */
-
   .form-check-input {
     height: $mainVal;
     width: calc(#{$index} + 0.75rem);

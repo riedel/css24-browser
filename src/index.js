@@ -7,6 +7,7 @@ import "bootstrap";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "./styles.scss";
+import { Predictor } from "./predict"
 import edgeML from "edge-ml";
 import MobileDetect from "mobile-detect";
 
@@ -30,10 +31,6 @@ function* getValuesBySelectors(obj, selectors) {
   }
 }
 
-document.getElementById("subject").value = Math.floor(
-  (1 + Math.random()) * 0x10000
-).toString(16);
-
 var defaultTags = {};
 
 const mobile = new MobileDetect(window.navigator.userAgent);
@@ -46,17 +43,24 @@ if (mobile.userAgent()) {
   defaultTags.browser = mobile.userAgent();
 }
 
+const p = new Predictor(
+  (input) => window.score(input),
+  [
+    "acceleration.x",
+    "acceleration.y",
+    "acceleration.z",
+    "accelerationIncludingGravity.x",
+    "accelerationIncludingGravity.y",
+    "accelerationIncludingGravity.z",
+    "rotationRate.alpha",
+    "rotationRate.beta",
+    "rotationRate.gamma",
+  ],
+  -1000,
+  ["Walking", "Standing", "Sitting"],
+);
+
 var sensors = {
-  deviceorientation: {
-    keys: ["alpha", "beta", "gamma"],
-    listener: function (/** @type {DeviceOrientationEvent} */ evt) {
-      record(
-        evt.type,
-        Object.fromEntries(getValuesBySelectors(evt, sensors[evt.type].keys)),
-        evt.timeStamp + performance.timeOrigin
-      );
-    },
-  },
   devicemotion: {
     keys: [
       "acceleration.x",
@@ -70,10 +74,10 @@ var sensors = {
       "rotationRate.gamma",
     ],
     listener: function (/** @type {DeviceMotionEvent} */ evt) {
-      record(
+      score(
         evt.type,
         Object.fromEntries(getValuesBySelectors(evt, sensors[evt.type].keys)),
-        evt.timeStamp + performance.timeOrigin
+        evt.timeStamp + performance.timeOrigin,
       );
     },
   },
@@ -82,21 +86,6 @@ var sensors = {
 async function start_recording() {
   for (var [sensor, fun] of Object.entries(sensors)) {
     defaultTags;
-    fun.collector = await edgeML.datasetCollector(
-      "https://edge-ml-beta.dmz.teco.edu", // Backend-URL
-      "30453cc6e632f6eab0adeb6eaf6250e2", // API-Key
-      sensor, // Name for the dataset
-      false, // False to provide own timestamps
-      fun.keys, // Name of the time-series to create in the dataset
-      Object.assign(
-        {
-          participantId: document.getElementById("subject").value,
-          activity: document.getElementById("label").value,
-        },
-        defaultTags
-      ),
-      "activity_" + document.getElementById("label").value
-    );
 
     window.addEventListener(sensor, fun.listener, true);
   }
@@ -109,26 +98,31 @@ async function stop_recording() {
   }
 }
 
-function record(eventtype, fields, eventtime) {
+function score(eventtype, fields, eventtime) {
   // time at which the event happend
   for (const [key, value] of Object.entries(fields)) {
     if (value !== null) {
-      sensors[eventtype].collector.addDataPoint(
-        Math.floor(eventtime),
-        key,
-        value
-      );
+      p.addDatapoint(key, value);
     }
   }
+
 }
 
 // Wir schalten einen Timer an/aus mit der checkbox
 document.getElementById("record").onchange = function () {
   if (this.checked) {
     start_recording();
-    document.getElementById("debug").innerHTML = "Recording.";
   } else {
     stop_recording();
     document.getElementById("debug").innerHTML = "Not recording.";
   }
+};
+
+const predict = async () => {
+  document.getElementById("debug").innerHTML = JSON.stringify(await p.predict(), null, 2)
+}
+
+
+document.getElementById("debug").onclick = () => {
+  predict()
 };
