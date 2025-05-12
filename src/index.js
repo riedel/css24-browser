@@ -84,7 +84,7 @@ async function start_recording() {
     defaultTags;
     fun.collector = await edgeML.datasetCollector(
       "https://edge-ml-beta.dmz.teco.edu", // Backend-URL
-      "30453cc6e632f6eab0adeb6eaf6250e2", // API-Key
+      "56ba92ae4337c488b302fc0c7b87de1c", // API-Key
       sensor, // Name for the dataset
       false, // False to provide own timestamps
       fun.keys, // Name of the time-series to create in the dataset
