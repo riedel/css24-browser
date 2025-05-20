@@ -1,2 +1,2 @@
-# css21-browser
+# css-browser
 Created with CodeSandbox
